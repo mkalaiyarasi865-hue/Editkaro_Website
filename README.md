@@ -1,13 +1,6 @@
 Editkaro.in - Video Editing Website
 A professional website for Editkaro.in video editing services. Showcasing portfolio, services, and contact information.
-Project Structure
-editkaro-website/
-├── index.html          # Homepage
-├── portfolio.html      # Portfolio with video gallery
-├── about.html          # About us page
-├── contact.html        # Contact page
-├── styles.css          # Main stylesheet
-└── script.js           # JavaScript functionality
+
 
 Features
   Modern dark theme design
