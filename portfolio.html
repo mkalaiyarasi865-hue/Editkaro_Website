@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Editkaro.in</title>
+    <meta name="description" content="Explore our video editing portfolio - short-form, long-form, gaming edits, football highlights, and more.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Portfolio Specific Enhancements */
+        .portfolio-hero {
+            padding: 6rem 0 3rem;
+            text-align: center;
+        }
+
+        .portfolio-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #a8b5d1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .portfolio-hero p {
+            font-size: 1.2rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .portfolio-filters {
+            padding: 2rem 0;
+        }
+
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--accent);
+            border-color: transparent;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            color: var(--text);
+            outline: none;
+            width: 200px;
+        }
+
+        .search-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .results-info {
+            color: var(--muted);
+            text-align: center;
+        }
+
+        /* Portfolio Grid */
+        .portfolio-grid {
+            padding: 2rem 0 4rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .video-card {
+            background: var(--glass);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 106, 0, 0.2);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-thumbnail iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-card:hover .video-overlay {
+            opacity: 1;
+        }
+
+        .play-button {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #000;
+        }
+
+        .video-info {
+            padding: 1rem;
+        }
+
+        .video-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .video-info p {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .load-more {
+            text-align: center;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 2rem;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            background: var(--card);
+            border-radius: var(--radius);
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            position: relative;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.5rem;
+        }
+
+        .lightbox-media {
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .lightbox-media iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: var(--radius);
+        }
+
+        .lightbox-info {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .lightbox-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .lightbox-meta {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .lightbox-info p {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .lightbox-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+            
+            .lightbox-content {
+                grid-template-columns: 1fr;
+                max-height: 95vh;
+            }
+            
+            .lightbox-media {
+                padding: 1rem;
+            }
+            
+            .lightbox-media iframe {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="logo" href="index.html" aria-label="Editkaro home">Editkaro<span>.in</span></a>
+            <nav class="main-nav">
+                <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu">
+                    <span class="hamburger">☰</span>
+                </button>
+                <ul id="nav-menu" class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="portfolio.html" class="nav-link active">Portfolio</a></li>
+                    <li><a href="about.html" class="nav-link">About Us</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="portfolio-main">
+        <section class="portfolio-hero">
+            <div class="container">
+                <h1>Our Creative Portfolio</h1>
+                <p>Explore our diverse range of video editing projects across different categories and styles</p>
+            </div>
+        </section>
+
+        <section class="portfolio-filters container">
+            <div class="filter-controls">
+                <div class="category-filters" id="categoryFilters">
+                    <!-- Filters will be generated by JavaScript -->
+                </div>
+                <div class="search-box">
+                    <input type="search" id="portfolioSearch" placeholder="Search projects...">
+                    <button class="search-btn">🔍</button>
+                </div>
+            </div>
+            <div class="results-info" id="resultsInfo">
+                Showing <span id="shownCount">0</span> of <span id="totalCount">0</span> projects
+            </div>
+        </section>
+
+        <section class="portfolio-grid container">
+            <div id="videoGrid" class="grid">
+                <!-- Videos will be loaded here by JavaScript -->
+            </div>
+            <div class="load-more">
+                <button id="loadMoreBtn" class="btn secondary">Load More Projects</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightboxClose">×</button>
+            <div class="lightbox-media">
+                <iframe id="lightboxVideo" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="lightbox-info">
+                <h3 id="lightboxTitle"></h3>
+                <div class="lightbox-meta">
+                    <span id="lightboxCategory" class="tag"></span>
+                    <span id="lightboxDuration" class="tag"></span>
+                </div>
+                <p id="lightboxDescription"></p>
+            </div>
+        </div>
+        <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Editkaro.in</h3>
+                    <p>Professional video editing services for brands and creators worldwide.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="portfolio.html?category=short-form">Short-Form Edits</a></li>
+                        <li><a href="portfolio.html?category=gaming">Gaming Videos</a></li>
+                        <li><a href="portfolio.html?category=ecommerce">eCommerce Ads</a></li>
+                        <li><a href="portfolio.html?category=color-grading">Color Grading</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="currentYear"></span> Editkaro.in. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Portfolio Data with YouTube Embeds
+        const portfolioData = {
+            categories: [
+                { id: 'all', name: 'All Projects' },
+                { id: 'short-form', name: 'Short Form' },
+                { id: 'long-form', name: 'Long Form' },
+                { id: 'gaming', name: 'Gaming Videos' },
+                { id: 'football', name: 'Football Edits' },
+                { id: 'ecommerce', name: 'eCommerce Ads' },
+                { id: 'documentary', name: 'Documentary Style' },
+                { id: 'color-grading', name: 'Color Grading' },
+                { id: 'anime', name: 'Anime Videos' }
+            ],
+            videos: [
+                {
+                    id: 1,
+                    title: "Instagram Reel - Fashion Brand",
+                    description: "Fast-paced 30-second fashion reel with trendy transitions and upbeat music for Instagram.",
+                    category: "short-form",
+                    duration: "0:30",
+                    videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw",
+                    thumbnail: "https://img.youtube.com/vi/jNQXAC9IVRw/maxresdefault.jpg"
+                },
+                {
+                    id: 2,
+                    title: "TikTok Ad - Coffee Shop",
+                    description: "Engaging TikTok advertisement showcasing a local coffee shop's signature drinks.",
+                    category: "short-form",
+                    duration: "0:45",
+                    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                    thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+                },
+                {
+                    id: 3,
+                    title: "Documentary - Urban Farming",
+                    description: "30-minute documentary exploring the rise of urban farming in metropolitan areas.",
+                    category: "long-form",
+                    duration: "28:15",
+                    videoUrl: "https://www.youtube.com/embed/9xwazD5SyVg",
+                    thumbnail: "https://img.youtube.com/vi/9xwazD5SyVg/maxresdefault.jpg"
+                },
+                {
+                    id: 4,
+                    title: "Corporate Training Video",
+                    description: "Comprehensive training video for corporate onboarding with clear explanations.",
+                    category: "long-form",
+                    duration: "15:30",
+                    videoUrl: "https://www.youtube.com/embed/LDU_Txk06tM",
+                    thumbnail: "https://img.youtube.com/vi/LDU_Txk06tM/maxresdefault.jpg"
+                },
+                {
+                    id: 5,
+                    title: "Valorant Montage - Epic Plays",
+                    description: "High-energy gaming montage featuring impressive plays from Valorant matches.",
+                    category: "gaming",
+                    duration: "3:45",
+                    videoUrl: "https://www.youtube.com/embed/5qap5aO4i9A",
+                    thumbnail: "https://img.youtube.com/vi/5qap5aO4i9A/maxresdefault.jpg"
+                },
+                {
+                    id: 6,
+                    title: "Minecraft Adventure Series",
+                    description: "Episodic Minecraft adventure with custom animations and engaging storytelling.",
+                    category: "gaming",
+                    duration: "12:20",
+                    videoUrl: "https://www.youtube.com/embed/9f6zH-56O1w",
+                    thumbnail: "https://img.youtube.com/vi/9f6zH-56O1w/maxresdefault.jpg"
+                },
+                {
+                    id: 7,
+                    title: "Champions League Highlights",
+                    description: "Dynamic football highlights from Champions League matches with cinematic effects.",
+                    category: "football",
+                    duration: "4:15",
+                    videoUrl: "https://www.youtube.com/embed/mRf3-JkwqfU",
+                    thumbnail: "https://img.youtube.com/vi/mRf3-JkwqfU/maxresdefault.jpg"
+                },
+                {
+                    id: 8,
+                    title: "Premier League Goal Compilation",
+                    description: "Best goals from Premier League season with multiple camera angles and slow motion.",
+                    category: "football",
+                    duration: "6:30",
+                    videoUrl: "https://www.youtube.com/embed/6_b7RDuLXYI",
+                    thumbnail: "https://img.youtube.com/vi/6_b7RDuLXYI/maxresdefault.jpg"
+                },
+                {
+                    id: 9,
+                    title: "Product Showcase - Smartwatch",
+                    description: "eCommerce advertisement highlighting features of a new smartwatch model.",
+                    category: "ecommerce",
+                    duration: "1:15",
+                    videoUrl: "https://www.youtube.com/embed/WVyEeea8d_0",
+                    thumbnail: "https://img.youtube.com/vi/WVyEeea8d_0/maxresdefault.jpg"
+                },
+                {
+                    id: 10,
+                    title: "Beauty Product Ad - Skincare",
+                    description: "Luxury skincare product advertisement with elegant visuals and soothing voiceover.",
+                    category: "ecommerce",
+                    duration: "1:30",
+                    videoUrl: "https://www.youtube.com/embed/3JZ_D3ELwOQ",
+                    thumbnail: "https://img.youtube.com/vi/3JZ_D3ELwOQ/maxresdefault.jpg"
+                },
+                {
+                    id: 11,
+                    title: "Historical Documentary - Ancient Cities",
+                    description: "Documentary exploring ancient civilizations with archival footage and expert interviews.",
+                    category: "documentary",
+                    duration: "42:10",
+                    videoUrl: "https://www.youtube.com/embed/6v2L2UGZJAM",
+                    thumbnail: "https://img.youtube.com/vi/6v2L2UGZJAM/maxresdefault.jpg"
+                },
+                {
+                    id: 12,
+                    title: "Wildlife Documentary - Ocean Life",
+                    description: "Underwater documentary showcasing marine biodiversity with stunning cinematography.",
+                    category: "documentary",
+                    duration: "38:45",
+                    videoUrl: "https://www.youtube.com/embed/BnHOsEL73cE",
+                    thumbnail: "https://img.youtube.com/vi/BnHOsEL73cE/maxresdefault.jpg"
+                },
+                {
+                    id: 13,
+                    title: "Cinematic Color Grading - Desert Scene",
+                    description: "Before and after demonstration of cinematic color grading for a desert landscape.",
+                    category: "color-grading",
+                    duration: "2:30",
+                    videoUrl: "https://www.youtube.com/embed/7NOSDKb0HlU",
+                    thumbnail: "https://img.youtube.com/vi/7NOSDKb0HlU/maxresdefault.jpg"
+                },
+                {
+                    id: 14,
+                    title: "Color Correction - Indoor Scene",
+                    description: "Professional color correction transforming a poorly lit indoor scene.",
+                    category: "color-grading",
+                    duration: "3:15",
+                    videoUrl: "https://www.youtube.com/embed/E37V9y_5Fh8",
+                    thumbnail: "https://img.youtube.com/vi/E37V9y_5Fh8/maxresdefault.jpg"
+                },
+                {
+                    id: 15,
+                    title: "Anime Opening Sequence",
+                    description: "Custom anime opening with original characters and dynamic animation.",
+                    category: "anime",
+                    duration: "1:45",
+                    videoUrl: "https://www.youtube.com/embed/hHW1oY26kxQ",
+                    thumbnail: "https://img.youtube.com/vi/hHW1oY26kxQ/maxresdefault.jpg"
+                },
+                {
+                    id: 16,
+                    title: "Anime Music Video - Action Scene",
+                    description: "High-energy anime music video featuring intense action sequences.",
+                    category: "anime",
+                    duration: "4:20",
+                    videoUrl: "https://www.youtube.com/embed/pManVUKj_1o",
+                    thumbnail: "https://img.youtube.com/vi/pManVUKj_1o/maxresdefault.jpg"
+                }
+            ]
+        };
+
+        // DOM Elements
+        const categoryFilters = document.getElementById('categoryFilters');
+        const videoGrid = document.getElementById('videoGrid');
+        const resultsInfo = document.getElementById('resultsInfo');
+        const shownCount = document.getElementById('shownCount');
+        const totalCount = document.getElementById('totalCount');
+        const portfolioSearch = document.getElementById('portfolioSearch');
+        const searchBtn = document.querySelector('.search-btn');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxClose = document.getElementById('lightboxClose');
+        const lightboxBackdrop = document.getElementById('lightboxBackdrop');
+        const lightboxVideo = document.getElementById('lightboxVideo');
+        const lightboxTitle = document.getElementById('lightboxTitle');
+        const lightboxCategory = document.getElementById('lightboxCategory');
+        const lightboxDuration = document.getElementById('lightboxDuration');
+        const lightboxDescription = document.getElementById('lightboxDescription');
+        const currentYear = document.getElementById('currentYear');
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
+
+        // State
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let displayedVideos = 8;
+
+        // Initialize
+        function init() {
+            renderCategoryFilters();
+            renderVideos();
+            setupEventListeners();
+            currentYear.textContent = new Date().getFullYear();
+            
+            // Mobile navigation
+            if (navToggle) {
+                navToggle.addEventListener('click', () => {
+                    const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
+                    navToggle.setAttribute('aria-expanded', !isExpanded);
+                    navMenu.classList.toggle('active');
+                });
+            }
+        }
+
+        // Render Category Filters
+        function renderCategoryFilters() {
+            categoryFilters.innerHTML = '';
+            
+            portfolioData.categories.forEach(category => {
+                const button = document.createElement('button');
+                button.className = `filter-btn ${category.id === currentFilter ? 'active' : ''}`;
+                button.textContent = category.name;
+                button.dataset.category = category.id;
+                categoryFilters.appendChild(button);
+            });
+        }
+
+        // Render Videos
+        function renderVideos() {
+            const filteredVideos = filterVideos();
+            videoGrid.innerHTML = '';
+            
+            const videosToShow = filteredVideos.slice(0, displayedVideos);
+            
+            if (videosToShow.length === 0) {
+                videoGrid.innerHTML = '<p class="no-results" style="text-align: center; color: var(--muted); grid-column: 1 / -1; padding: 2rem;">No videos found matching your criteria.</p>';
+            } else {
+                videosToShow.forEach(video => {
+                    const videoCard = createVideoCard(video);
+                    videoGrid.appendChild(videoCard);
+                });
+            }
+            
+            updateResultsInfo(filteredVideos.length);
+            
+            // Show/hide load more button
+            loadMoreBtn.style.display = filteredVideos.length > displayedVideos ? 'block' : 'none';
+        }
+
+        // Filter Videos
+        function filterVideos() {
+            return portfolioData.videos.filter(video => {
+                const matchesCategory = currentFilter === 'all' || video.category === currentFilter;
+                const matchesSearch = !currentSearch || 
+                    video.title.toLowerCase().includes(currentSearch) ||
+                    video.description.toLowerCase().includes(currentSearch) ||
+                    video.category.toLowerCase().includes(currentSearch);
+                
+                return matchesCategory && matchesSearch;
+            });
+        }
+
+        // Create Video Card
+        function createVideoCard(video) {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.innerHTML = `
+                <div class="video-thumbnail">
+                    <img src="${video.thumbnail}" alt="${video.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="video-overlay">
+                        <button class="play-button">▶</button>
+                    </div>
+                </div>
+                <div class="video-info">
+                    <h3>${video.title}</h3>
+                    <p>${video.description}</p>
+                    <div class="video-meta">
+                        <span class="tag">${getCategoryName(video.category)}</span>
+                        <span class="duration">${video.duration}</span>
+                    </div>
+                </div>
+            `;
+            
+            card.addEventListener('click', () => openLightbox(video));
+            return card;
+        }
+
+        // Get Category Name
+        function getCategoryName(categoryId) {
+            const category = portfolioData.categories.find(cat => cat.id === categoryId);
+            return category ? category.name : categoryId;
+        }
+
+        // Update Results Info
+        function updateResultsInfo(total) {
+            const shown = Math.min(displayedVideos, total);
+            shownCount.textContent = shown;
+            totalCount.textContent = total;
+        }
+
+        // Open Lightbox
+        function openLightbox(video) {
+            lightboxTitle.textContent = video.title;
+            lightboxCategory.textContent = getCategoryName(video.category);
+            lightboxDuration.textContent = video.duration;
+            lightboxDescription.textContent = video.description;
+            lightboxVideo.src = video.videoUrl;
+            
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Lightbox
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            lightboxVideo.src = '';
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Category filter buttons
+            categoryFilters.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    currentFilter = e.target.dataset.category;
+                    displayedVideos = 8;
+                    renderCategoryFilters();
+                    renderVideos();
+                }
+            });
+            
+            // Search functionality
+            searchBtn.addEventListener('click', performSearch);
+            portfolioSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Load more button
+            loadMoreBtn.addEventListener('click', () => {
+                displayedVideos += 8;
+                renderVideos();
+            });
+            
+            // Lightbox
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightboxBackdrop.addEventListener('click', closeLightbox);
+        }
+
+        // Perform Search
+        function performSearch() {
+            currentSearch = portfolioSearch.value.toLowerCase().trim();
+            displayedVideos = 8;
+            renderVideos();
+        }
+
+        // Initialize the portfolio
+        init();
+    </script>
+</body>
+</html>
